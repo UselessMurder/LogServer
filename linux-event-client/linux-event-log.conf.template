@@ -1,0 +1,9 @@
+source s_src {
+       system();
+       internal();
+};
+destination d_net {
+tcp("192.168.0.1" port(6514)
+);
+};
+log { source(s_src); destination(d_net); };

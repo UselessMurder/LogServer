@@ -1,0 +1,17 @@
+source s_windows_example_file_log_tcp_source {
+ tcp(ip(0.0.0.0) port(6517)); };
+
+destination d_windows_example_file_elastic {
+ elasticsearch2 (
+   cluster("LogCluster")
+   client_mode("http")
+   index("windows-example-file-log-${YEAR}.${MONTH}")
+   type("test")
+   time-zone("UTC")
+   flush-limit("10000")
+   cluster_url("http://127.0.0.1:9200")
+   custom_id("${UNIQID}")
+   template("$(format-json --scope rfc5424 --scope nv-pairs --exclude DATA --key ISODATE)")
+ );
+};
+log { source(s_windows_example_file_log_tcp_source); destination(d_windows_example_file_elastic); };

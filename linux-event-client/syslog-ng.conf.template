@@ -1,0 +1,20 @@
+@version: 3.13
+@include "scl.conf"
+
+options {
+        sync (5000);
+        time_reopen (10);
+        time_reap(5);
+        long_hostnames (off);
+        use_dns (no);
+        use_fqdn (no);
+        create_dirs (no);
+        keep_hostname (yes);
+        log_fifo_size (536870912);
+        stats_freq(60);
+        flush_lines(500);
+        flush_timeout(10000);
+        bad_hostname("^gconfd$");
+};
+
+@include "/etc/syslog-ng/conf.d/*.conf"
