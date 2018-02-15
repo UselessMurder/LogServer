@@ -1,0 +1,21 @@
+source s_linux_example_file_log_tls_source {
+ tcp(ip(0.0.0.0) port(6517)
+ tls(key_file("/etc/syslog-ng/cert.d/serverkey.pem")
+ cert_file("/etc/syslog-ng/cert.d/servercert.pem")
+ ca_dir("/etc/syslog-ng/ca.d"))
+ ); };
+
+destination d_linux_example_file_elastic {
+ elasticsearch2 (
+   cluster("LogCluster")
+   client_mode("http")
+   index("linux-example-file-log-${YEAR}.${MONTH}")
+   type("test")
+   time-zone("UTC")
+   flush-limit("10000")
+   cluster_url("http://127.0.0.1:9200")
+   custom_id("${UNIQID}")
+   template("$(format-json --scope rfc5424 --scope nv-pairs --exclude DATE --key ISODATE)")
+ );
+};
+log { source(s_linux_example_file_log_tls_source); destination(d_linux_example_file_elastic); };

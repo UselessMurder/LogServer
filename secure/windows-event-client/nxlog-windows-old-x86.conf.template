@@ -1,0 +1,93 @@
+define ROOT C:\Program Files\nxlog
+
+Moduledir %ROOT%\modules
+CacheDir %ROOT%\data
+Pidfile %ROOT%\data\nxlog.pid
+SpoolDir %ROOT%\data
+LogFile %ROOT%\data\nxlog.log
+
+<Extension _syslog>
+    Module      xm_syslog
+</Extension>
+
+<Extension xm_json>
+    Module xm_json
+</Extension>
+
+<Extension charconv>
+    Module xm_charconv
+</Extension>
+
+<Extension transform_alienvault_csv>
+    Module          xm_csv
+    Fields          $EventTime, $EventTimeWritten, $Hostname, $SourceName, $EventID, $CategoryNumber, $Category, $FileName, $AccountName, $AccountType, $Domain, $SeverityValue, $Severity, $EventType, $Message, $RecordNumber
+    FieldTypes      string, string, string, string, string, string, string, string, string, string, string, string, string, string, string , string
+    Delimiter       ;
+</Extension>
+
+<Input in_windows_events>
+    Module      im_mseventlog
+    ReadFromLast TRUE
+    UTF8         TRUE
+</Input>
+
+<Output out_alienvault_csv>
+    Module          om_ssl
+    Host            192.168.0.1
+    Port            6515
+    CAFile %ROOT%\cert\cacert.pem
+    CertFile %ROOT%\cert\clientcert.pem
+    CertKeyFile %ROOT%\cert\clientkey.pem
+    AllowUntrusted FALSE
+    Exec    \
+            {\
+                if not defined get_var('rate') { create_var('rate'); set_var('rate',1); }\
+                if not defined get_var('stormed'){ create_var('stormed',2); set_var('stormed',0); set_var('rate',1); }\
+                set_var('rate',get_var('rate')+1);\
+                if not defined get_var('sec')\
+                {\
+                    create_var('sec',1);\
+                    set_var('sec',1);\
+                    if get_var('rate') >= 200 { delete_var('stormed'); create_var('stormed',2); set_var('stormed',1); set_var('rate',1); drop(); } else { set_var('stormed',0); set_var('rate',1); }\
+                }\
+                else if get_var('stormed') == 1\
+                {\
+                    drop();\
+                }\
+                if get_var('rate') >= 200\
+                {\
+                    if not defined get_var('warning')\
+                    {\
+                        log_warning("Eventstorm detected.");\
+                        create_var('warning',60);\
+                        set_var('warning',1);\
+                    }\
+                    drop();\
+                }\
+            }
+    Exec            $Message = replace($Message, "\t", " "); $Message = replace($Message, "\n", " "); $Message = replace($Message, "\r", " "); $Message = replace($Message, "\"", "'");  
+
+    Exec            if not defined $Message { $Message = "-"; }
+    Exec            if not defined $EventTime { $EventTime = "-"; }
+    Exec            if not defined $EventTimeWritten { $EventTimeWritten = "-"; }
+    Exec            if not defined $Hostname { $Hostname = "-"; }
+    Exec            if not defined $SourceName { $SourceName = "-"; }
+    Exec            if not defined $EventID { $EventID = "-"; }
+    Exec            if not defined $CategoryNumber { $CategoryNumber = "-"; }
+    Exec            if not defined $Category { $Category = "-"; }
+    Exec            if not defined $FileName { $FileName = "-"; }
+    Exec            if not defined $AccountName { $AccountName = "-"; }
+    Exec            if not defined $AccountType { $AccountType = "-"; }
+    Exec            if not defined $Domain { $Domain = "-"; }
+    Exec            if not defined $SeverityValue { $SeverityValue = "-"; }
+    Exec            if not defined $Severity { $Severity = "-"; }
+    Exec            if not defined $EventType { $EventType = "-"; }
+    Exec            if not defined $RecordNumber { $RecordNumber = "-"; }
+
+    Exec            transform_alienvault_csv->to_csv();
+</Output>
+
+<Route 1>
+    Path            in_windows_events => out_alienvault_csv
+</Route>
+

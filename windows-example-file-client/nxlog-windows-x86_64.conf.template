@@ -1,0 +1,32 @@
+define ROOT C:\Program Files (x86)\nxlog
+
+Moduledir %ROOT%\modules
+CacheDir %ROOT%\data
+Pidfile %ROOT%\data\nxlog.pid
+SpoolDir %ROOT%\data
+LogFile %ROOT%\data\nxlog.log
+
+<Extension _syslog>
+    Module      xm_syslog
+</Extension>
+
+<Input in>
+    Module          im_file
+    File            'filename'
+    SavePos         TRUE
+    ReadFromLast    TRUE
+    PollInterval    1
+    Exec $Message = $raw_event; $SyslogFacilityValue = 22;
+</Input>
+
+<Output out>
+    Module          om_tcp
+    Host            192.168.0.1
+    Port            6518
+    Exec            to_syslog_ietf();
+</Output>
+
+<Route 1>
+    Path            in => out
+</Route>
+

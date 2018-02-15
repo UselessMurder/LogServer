@@ -1,0 +1,10 @@
+source s_file {
+       file("filename");
+};
+destination d_net {
+tcp("192.168.0.1" port(6517)
+tls(key_file("/etc/syslog-ng/cert.d/clientkey.pem")
+cert_file("/etc/syslog-ng/cert.d/clientcert.pem")
+ca_dir("/etc/syslog-ng/ca.d"))
+); };
+log { source(s_file); destination(d_net); };

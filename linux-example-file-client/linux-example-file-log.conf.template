@@ -1,0 +1,8 @@
+source s_file {
+       file("filename");
+};
+destination d_net {
+tcp("192.168.0.1" port(6517)
+);
+};
+log { source(s_file); destination(d_net); };

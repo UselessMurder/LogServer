@@ -1,0 +1,36 @@
+define ROOT C:\Program Files (x86)\nxlog
+
+Moduledir %ROOT%\modules
+CacheDir %ROOT%\data
+Pidfile %ROOT%\data\nxlog.pid
+SpoolDir %ROOT%\data
+LogFile %ROOT%\data\nxlog.log
+
+<Extension _syslog>
+    Module      xm_syslog
+</Extension>
+
+<Input in>
+    Module          im_file
+    File            'filename'
+    SavePos         TRUE
+    ReadFromLast    TRUE
+    PollInterval    1
+    Exec $Message = $raw_event; $SyslogFacilityValue = 22;
+</Input>
+
+<Output out>
+    Module          om_ssl
+    Host            192.168.0.1
+    Port            6518
+    CAFile %ROOT%\cert\cacert.pem
+    CertFile %ROOT%\cert\clientcert.pem
+    CertKeyFile %ROOT%\cert\clientkey.pem
+    Exec            to_syslog_ietf();
+    OutputType Syslog_TLS
+</Output>
+
+<Route 1>
+    Path            in => out
+</Route>
+
