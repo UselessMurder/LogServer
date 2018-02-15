@@ -11,7 +11,7 @@ destination d_linux_event_elastic {
    flush-limit("10000")
    cluster_url("http://127.0.0.1:9200")
    custom_id("${UNIQID}")
-   template("$(format-json --scope rfc5424 --scope nv-pairs --exclude DATA --key ISODATE)")
+   template("$(format-json --scope rfc5424 --scope nv-pairs --exclude DATE --key ISODATE)")
  );
 };
 log { source(s_linux_event_log_tcp_source); destination(d_linux_event_elastic); };

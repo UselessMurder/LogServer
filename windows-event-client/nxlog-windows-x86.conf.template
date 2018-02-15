@@ -20,41 +20,21 @@ LogFile %ROOT%\data\nxlog.log
 
 <Extension transform_alienvault_csv>
     Module          xm_csv
-    Fields          $EventTime, $EventType, $Severity, $Channel, $Hostname, $EventID, $SourceName, $AccountName, $AccountType, $Domain, $Message
-    FieldTypes      string, string, string, string, string, string, string, string, string, string, string
+    Fields          $EventTime, $Hostname, $SourceName, $EventID, $Task, $Category, $Keywords, $Channel, $AccountName, $AccountType, $Domain, $UserID, $SeverityValue, $Severity, $EventType, $ProviderGuid, $Version, $OpcodeValue, $Opcode, $ActivityID, $RelatedActivityID, $ProcessID, $ThreadID, $Message, $RecordNumber
+    FieldTypes      string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string,
     Delimiter       ;
 </Extension>
 
 <Input in_windows_events>
     Module          im_msvistalog
-    SavePos         FALSE
     ReadFromLast    TRUE
-    Query           <QueryList>                                         \
-                        <Query Id='0' Path='ForwardedEvents'>           \
-                            <Select Path='ForwardedEvents'>*</Select>   \
-                        </Query>                                        \
-                    </QueryList>
-    Query           <QueryList>                                         \
-                        <Query Id="0">                                  \
-                            <Select Path="Security">*</Select>          \
-                            <Select Path="System">*</Select>            \
-                            <Select Path="Application">*</Select>       \
-                            <Select Path="SomeOtherPath/XY">*</Select>  \
-                            </Query>                                    \
-                    </QueryList>
 </Input>
-
-<Processor match_events>
-    Module          pm_pattern
-    PatternFile     %ROOT%\conf\patterndb.xml
-</Processor>
 
 <Output out_alienvault_csv>
     Module          om_tcp
     Host            192.168.0.1
-    Port            6515
+    Port            6516
     
-    Exec            if not defined $PatternID or not defined $Message { drop(); }
     Exec    \
             {\
                 if not defined get_var('rate') { create_var('rate'); set_var('rate',1); }\
@@ -81,16 +61,38 @@ LogFile %ROOT%\data\nxlog.log
                     drop();\
                 }\
             }
-    Exec            $Message = replace($Message, "\t", " "); $Message = replace($Message, "\n", " "); $Message = replace($Message, "\r", " ");
+    Exec            $Message = replace($Message, "\t", " "); $Message = replace($Message, "\n", " "); $Message = replace($Message, "\r", " ");  $Message = replace($Message, "\"", "'");   
 
+    Exec            if not defined $Message { $Message = "-"; }
+    Exec            if not defined $EventTime { $EventTime = "-"; }
+    Exec            if not defined $Hostname { $Hostname = "-"; }
+    Exec            if not defined $SourceName { $SourceName = "-"; }
+    Exec            if not defined $EventID { $EventID = "-"; }
+    Exec            if not defined $Task { $Task = "-"; }
+    Exec            if not defined $Category{ $Category = "-"; }
+    Exec            if not defined $Keywords { $Keywords = "-"; }
+    Exec            if not defined $Channel{ $Channel = "-"; }
     Exec            if not defined $AccountName { $AccountName = "-"; }
     Exec            if not defined $AccountType { $AccountType = "-"; }
-    Exec            if not defined $Domain { $Domain = "-"; }       
+    Exec            if not defined $Domain { $Domain = "-"; }
+    Exec            if not defined $UserID { $UserID = "-"; }
+    Exec            if not defined $SeverityValue { $SeverityValue = "-"; }
+    Exec            if not defined $Severity { $Severity = "-"; }
+    Exec            if not defined $EventType { $EventType = "-"; }
+    Exec            if not defined $ProviderGuid { $ProviderGuid = "-"; }
+    Exec            if not defined $Version { $Version = "-"; }
+    Exec            if not defined $OpcodeValue { $OpcodeValue = "-"; }
+    Exec            if not defined $Opcode { $Opcode = "-"; }
+    Exec            if not defined $ActivityID { $ActivityID = "-"; }
+    Exec            if not defined $RelatedActivityID { $RelatedActivityID = "-"; }
+    Exec            if not defined $ProcessID { $ProcessID = "-"; }
+    Exec            if not defined $ThreadID { $ThreadID = "-"; }        
+    Exec            if not defined $RecordNumber { $RecordNumber = "-"; }
 
     Exec            transform_alienvault_csv->to_csv();
 </Output>
 
 <Route 1>
-    Path            in_windows_events => match_events => out_alienvault_csv
+    Path            in_windows_events => out_alienvault_csv
 </Route>
 

@@ -20,27 +20,21 @@ LogFile %ROOT%\data\nxlog.log
 
 <Extension transform_alienvault_csv>
     Module          xm_csv
-    Fields          $EventTime, $EventType, $Severity, $Channel, $Hostname, $EventID, $SourceName, $AccountName, $AccountType, $Domain, $Message
-    FieldTypes      string, string, string, string, string, string, string, string, string, string, string
+    Fields          $EventTime, $EventTimeWritten, $Hostname, $SourceName, $EventID, $CategoryNumber, $Category, $FileName, $AccountName, $AccountType, $Domain, $SeverityValue, $Severity, $EventType, $Message, $RecordNumber
+    FieldTypes      string, string, string, string, string, string, string, string, string, string, string, string, string, string, string , string
     Delimiter       ;
 </Extension>
 
 <Input in_windows_events>
     Module      im_mseventlog
     ReadFromLast TRUE
+    UTF8         TRUE
 </Input>
-
-<Processor match_events>
-    Module          pm_pattern
-    PatternFile     %ROOT%\conf\patterndb.xml
-</Processor>
 
 <Output out_alienvault_csv>
     Module          om_tcp
     Host            192.168.0.1
     Port            6515
-    
-    Exec            if not defined $PatternID or not defined $Message { drop(); }
     Exec    \
             {\
                 if not defined get_var('rate') { create_var('rate'); set_var('rate',1); }\
@@ -67,16 +61,28 @@ LogFile %ROOT%\data\nxlog.log
                     drop();\
                 }\
             }
-    Exec            $Message = replace($Message, "\t", " "); $Message = replace($Message, "\n", " "); $Message = replace($Message, "\r", " ");
+    Exec            $Message = replace($Message, "\t", " "); $Message = replace($Message, "\n", " "); $Message = replace($Message, "\r", " "); $Message = replace($Message, "\"", "'");  
 
+    Exec            if not defined $Message { $Message = "-"; }
+    Exec            if not defined $EventTime { $EventTime = "-"; }
+    Exec            if not defined $EventTimeWritten { $EventTimeWritten = "-"; }
+    Exec            if not defined $Hostname { $Hostname = "-"; }
+    Exec            if not defined $SourceName { $SourceName = "-"; }
+    Exec            if not defined $EventID { $EventID = "-"; }
+    Exec            if not defined $CategoryNumber { $CategoryNumber = "-"; }
+    Exec            if not defined $Category { $Category = "-"; }
+    Exec            if not defined $FileName { $FileName = "-"; }
     Exec            if not defined $AccountName { $AccountName = "-"; }
     Exec            if not defined $AccountType { $AccountType = "-"; }
-    Exec            if not defined $Domain { $Domain = "-"; }       
+    Exec            if not defined $Domain { $Domain = "-"; }
+    Exec            if not defined $SeverityValue { $SeverityValue = "-"; }
+    Exec            if not defined $Severity { $Severity = "-"; }
+    Exec            if not defined $EventType { $EventType = "-"; }
+    Exec            if not defined $RecordNumber { $RecordNumber = "-"; }
 
     Exec            transform_alienvault_csv->to_csv();
 </Output>
 
 <Route 1>
-    Path            in_windows_events => match_events => out_alienvault_csv
+    Path            in_windows_events => out_alienvault_csv
 </Route>
-
