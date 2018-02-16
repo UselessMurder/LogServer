@@ -9,7 +9,7 @@ destination d_windows_old_event_elastic {
  elasticsearch2 (
    cluster("LogCluster")
    client_mode("http")
-   index("windows-old-event-log-${YEAR}.${MONTH}")
+   index("windows-event-old-log-${YEAR}.${MONTH}")
    type("test")
    time-zone("UTC")
    flush-limit("10000")
