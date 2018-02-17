@@ -1,0 +1,25 @@
+name: field_detected
+type: frequency
+index: u-i-event-linux-*
+
+num_events: 1
+
+timeframe:
+  minutes: 2
+
+timestamp_field: ISODATE
+
+filter:
+
+- query:
+    query_string:
+      query: "PRIORITY=info"
+
+realert:
+  minutes: 0
+
+alert:
+- "telegram"
+- "email"
+
+telegram_room_id: "someid"

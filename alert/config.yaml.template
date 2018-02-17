@@ -1,0 +1,22 @@
+rules_folder: rules
+run_every:
+  minutes: 1
+buffer_time:
+  minutes: 15
+es_host: localhost
+es_port: 9200
+use_ssl: False
+timestamp_field: "ISODATE"
+es_username: 'elastic'
+es_password: '123321'
+writeback_index: elastalert_status
+alert_time_limit:
+  days: 2
+telegram_bot_token: '548473283:AAH1EPr2yUjTbUCSLS6iCvzUb1gsG78f6Vo'
+email: 'some@gmail.com'
+smtp_host: 'smtp.gmail.com'
+smtp_port: 465
+smtp_ssl: True
+smtp_auth_file: '/etc/elasticalert/email.yaml'
+
+
