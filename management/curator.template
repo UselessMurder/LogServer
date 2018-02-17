@@ -1,0 +1,2 @@
+HOME=/etc/es-curator
+0 0 1 * * elasticsearch /usr/bin/curator --config /etc/es-curator/config.yml /etc/es-curator/action_file.yml

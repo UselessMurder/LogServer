@@ -1,0 +1,19 @@
+--- 
+client: 
+  certificate:
+  client_cert:
+  client_key:
+  hosts: "127.0.0.1"
+  http_auth: "elastic:123321"
+  master_only: false
+  port: 9200
+  ssl_no_validate: false
+  timeout: 30
+  url_prefix:
+logging: 
+  blacklist: 
+    - elasticsearch
+    - urllib3
+  logfile: /var/log/es-curator/curator.log
+  logformat: default
+  loglevel: INFO

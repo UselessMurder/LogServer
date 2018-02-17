@@ -4,6 +4,6 @@ source s_src {
 };
 destination d_net {
 tcp("192.168.0.1" port(6514)
-);
-};
+time_zone("Asia/Yekaterinburg")
+); };
 log { source(s_src); destination(d_net); };

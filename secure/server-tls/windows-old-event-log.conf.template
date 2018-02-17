@@ -3,19 +3,20 @@ source s_windows_old_event_log_tls_source {
  tls(key_file("/etc/syslog-ng/cert.d/serverkey.pem")
  cert_file("/etc/syslog-ng/cert.d/servercert.pem")
  ca_dir("/etc/syslog-ng/ca.d"))
+ time_zone("Asia/Yekaterinburg")
  ); };
 
 destination d_windows_old_event_elastic {
  elasticsearch2 (
    cluster("LogCluster")
    client_mode("http")
-   index("windows-event-old-log-${YEAR}.${MONTH}")
+   index("u-i-event-windows-old-log-${YEAR}.${MONTH}")
    type("test")
-   time-zone("UTC")
+   time_zone("Asia/Yekaterinburg")
    flush-limit("10000")
    cluster_url("http://127.0.0.1:9200")
-   template("$(format-json --scope rfc5424 --scope nv-pairs --exclude FACILITY --exclude DATE --exclude HOST --exclude PROGRAM --exclude LEGACY_MSGHDR --exclude MESSAGE --exclude PRIORITY --key ISODATE)")
    custom_id("${UNIQID}")
+   template("$(format-json --scope rfc5424 --scope nv-pairs --exclude FACILITY --exclude DATE --exclude HOST --exclude PROGRAM --exclude LEGACY_MSGHDR --exclude MESSAGE --exclude PRIORITY --key ISODATE)")
  );
 };
 

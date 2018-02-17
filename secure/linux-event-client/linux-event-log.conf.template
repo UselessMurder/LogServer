@@ -7,5 +7,6 @@ tcp("192.168.0.1" port(6514)
 tls(key_file("/etc/syslog-ng/cert.d/clientkey.pem")
 cert_file("/etc/syslog-ng/cert.d/clientcert.pem")
 ca_dir("/etc/syslog-ng/ca.d"))
+time_zone("Asia/Yekaterinburg")
 ); };
 log { source(s_src); destination(d_net); };

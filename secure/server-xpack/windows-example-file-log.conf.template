@@ -1,13 +1,15 @@
 source s_windows_example_file_log_tcp_source {
- tcp(ip(0.0.0.0) port(6518)); };
+ tcp(ip(0.0.0.0) port(6518)
+ time_zone("Asia/Yekaterinburg")
+ ); };
 
 destination d_windows_example_file_elastic {
  elasticsearch2 (
    cluster("LogCluster")
    client_mode("https")
-   index("windows-example-file-log-${YEAR}.${MONTH}")
+   index("u-windows-example-file-log-${YEAR}.${MONTH}")
    type("test")
-   time-zone("UTC")
+   time_zone("Asia/Yekaterinburg")
    flush-limit("10000")
    cluster_url("http://127.0.0.1:9200")
    custom_id("${UNIQID}")

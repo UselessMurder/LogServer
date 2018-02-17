@@ -3,15 +3,16 @@ source s_linux_example_file_log_tls_source {
  tls(key_file("/etc/syslog-ng/cert.d/serverkey.pem")
  cert_file("/etc/syslog-ng/cert.d/servercert.pem")
  ca_dir("/etc/syslog-ng/ca.d"))
+ time_zone("Asia/Yekaterinburg")
  ); };
 
 destination d_linux_example_file_elastic {
  elasticsearch2 (
    cluster("LogCluster")
    client_mode("http")
-   index("linux-example-file-log-${YEAR}.${MONTH}")
+   index("u-linux-example-file-log-${YEAR}.${MONTH}")
    type("test")
-   time-zone("UTC")
+   time_zone("Asia/Yekaterinburg")
    flush-limit("10000")
    cluster_url("http://127.0.0.1:9200")
    custom_id("${UNIQID}")
