@@ -1,5 +1,6 @@
 [Unit]
 Description=Elastalert
+Requries=elasticsearch.service
 After=elasticsearch.service
 
 [Service]

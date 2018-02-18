@@ -12,7 +12,7 @@ es_password: '123321'
 writeback_index: elastalert_status
 alert_time_limit:
   days: 2
-telegram_bot_token: '548473283:AAH1EPr2yUjTbUCSLS6iCvzUb1gsG78f6Vo'
+telegram_bot_token: 'some_number:some_string'
 email: 'some@gmail.com'
 smtp_host: 'smtp.gmail.com'
 smtp_port: 465
